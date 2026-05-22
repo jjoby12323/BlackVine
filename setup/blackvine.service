@@ -4,11 +4,12 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+# Replace angoor_pi with your username if different
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/blackvine
-EnvironmentFile=/home/pi/blackvine/.env
-ExecStart=/home/pi/blackvine/venv/bin/gunicorn -w 1 --threads 4 -b 0.0.0.0:5000 "server.app:create_app()"
+User=angoor_pi
+WorkingDirectory=/home/angoor_pi/blackvine
+EnvironmentFile=/home/angoor_pi/blackvine/.env
+ExecStart=/home/angoor_pi/blackvine/venv/bin/gunicorn -w 1 --threads 4 -b 0.0.0.0:5000 "server.app:create_app()"
 Restart=on-failure
 RestartSec=5
 
