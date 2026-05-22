@@ -1,0 +1,16 @@
+[Unit]
+Description=BlackVine Light Notification Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/blackvine
+EnvironmentFile=/home/pi/blackvine/.env
+ExecStart=/home/pi/blackvine/venv/bin/gunicorn -w 1 --threads 4 -b 0.0.0.0:5000 "server.app:create_app()"
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

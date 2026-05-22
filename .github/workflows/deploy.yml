@@ -1,0 +1,21 @@
+name: Deploy to RPi
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code
+        working-directory: ~/blackvine
+        run: git pull
+
+      - name: Install dependencies
+        working-directory: ~/blackvine
+        run: venv/bin/pip install -r requirements.txt --quiet
+
+      - name: Restart service
+        # Requires: pi ALL=(ALL) NOPASSWD: /bin/systemctl restart blackvine
+        run: sudo systemctl restart blackvine
