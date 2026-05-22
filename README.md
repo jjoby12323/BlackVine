@@ -106,16 +106,40 @@ GET /health  →  {"status": "ok"}
 
 ## Auto-deploy (GitHub Actions)
 
-BlackVine ships with a self-hosted runner workflow that redeploys on every push to `main`. The runner runs directly on the RPi — no ports need to be open.
+BlackVine ships with a self-hosted runner workflow that redeploys on every push to `main`. The runner runs directly on the RPi and dials out to GitHub — no open ports or tunnels required.
 
 ### One-time RPi setup
 
-1. Register a self-hosted runner on the repo: **Settings → Actions → Runners → New self-hosted runner** — follow the Linux/ARM instructions.
+**1. Register the runner**
 
-2. Allow the runner to restart the service without a password:
+Go to your repo on GitHub: **Settings → Actions → Runners → New self-hosted runner → Linux → ARM64**
+
+GitHub will generate a set of commands. Run them on the RPi:
 
 ```bash
-echo "pi ALL=(ALL) NOPASSWD: /bin/systemctl restart blackvine" | sudo tee /etc/sudoers.d/blackvine
+mkdir ~/actions-runner && cd ~/actions-runner
+# download and extract (use the exact URL GitHub gives you)
+curl -o actions-runner-linux-arm64.tar.gz -L <url>
+tar xzf ./actions-runner-linux-arm64.tar.gz
+./config.sh --url https://github.com/<you>/BlackVine --token <token>
+```
+
+Accept the defaults when prompted (runner name, work folder, labels).
+
+**2. Install as a systemd service so it survives reboots**
+
+```bash
+sudo ./svc.sh install
+sudo ./svc.sh start
+sudo ./svc.sh status   # should show active (running)
+```
+
+**3. Allow the runner to restart the blackvine service without a password**
+
+Replace `<your-username>` with the user the runner runs as (e.g. `pi`, `angoor_pi`):
+
+```bash
+echo "<your-username> ALL=(ALL) NOPASSWD: /bin/systemctl restart blackvine" | sudo tee /etc/sudoers.d/blackvine
 ```
 
 After that, every push to `main` automatically pulls the latest code and restarts the server.
